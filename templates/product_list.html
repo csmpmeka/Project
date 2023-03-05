@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Product Details</title>
+{% endblock%}
+
+{% block body %}
+<div class="container">
+    <div class="container-fluid pt-5 pb-3">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">PRODUCTS FOR: <span
+                style="color:orange">{{category_title}}</span></span>
+        </h2>
+
+        <div class="row px-xl-5">
+            {% for ad in products%}
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                <div class="product-item bg-light mb-4">
+                    <div class="product-img position-relative overflow-hidden">
+                        {% if ad.product_image %}
+                        <img width="225" height="150" src="{{ad.product_image.url}}" alt="">
+                        {% else %}
+                        <img width="225" height="150"
+                             src="https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg"
+                             alt="">
+                        {% endif %}
+                    </div>
+                    <div class="text-center py-4">
+                        <a class="h6 text-decoration-none text-truncate" href="{% url 'product_details' ad.id %}">{{ad.title}}</a>
+                        <div class="d-flex align-items-center justify-content-center mt-2">
+                            <h5>${{ad.price}}</h5>
+                            <h6 class="text-muted ml-2">
+                                <del>${{ad.price}}</del>
+                            </h6>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center mb-1">
+                            <small>{{ad.state}}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+<div class="main-block">
+    <h1>Post Your Advertisement</h1>
+    <form action="{% url 'post_ad' %}" method="post" enctype="multipart/form-data">
+        <hr>
+        <div class="account-type">
+            <input type="radio" value="none" id="radioOne" name="account" checked/>
+            <label for="radioOne" class="radio">Normal Ad</label>
+            <input type="radio" value="none" id="radioTwo" name="account"/>
+            <label for="radioTwo" class="radio">Premium Ad</label>
+        </div>
+        <hr>
+
+        <input type="text" name="title" id="title" placeholder="Ad Title" required/>
+        <input type="text" name="description" id="description" placeholder="Description" required/>
+        <input type="text" name="price" id="price" placeholder="Price" required/>
+        <input type="text" name="warranty" id="warranty" placeholder="warranty" required/>
+        <label for="category">Choose Category:</label>
+        <select id="category" name="category">
+            <option value="Electronics">Electronics</option>
+            <option value="Apparels">Apparels & Accessories</option>
+            <option value="Automobiles">Automobiles</option>
+            <option value="Books">Books</option>
+        </select>
+        <label for="category">Product Status:</label>
+        <select id="status" name="status">
+            <option value="Brand New">Brand New</option>
+            <option value="Like New">Like New</option>
+            <option value="Used">Used</option>
+        </select>
+        <div>
+            <label for="file">Upload Ad Image</label>
+            <input type="file" id="file" name="file" multiple/>
+        </div>
+        <hr>
+        <hr>
+
+        <div class="btn-block">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
+

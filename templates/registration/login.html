@@ -23,7 +23,7 @@
 				<form id="login-form" method="post" action="{% url 'login' %}">
 				<h2>LOGIN</h2>
                 {% csrf_token %}
-				<input type="text" placeholder="Username" name="username" id="id_username" required="">
+				<input type="text" placeholder="Username" name="username" id="id_username" style="radius:5px" required="">
 				<input type="password" placeholder="Password" name="password" id="id_password" required="">
 				<button type="submit">Login</button>
 				</form>

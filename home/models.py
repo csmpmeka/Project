@@ -27,6 +27,7 @@ class Advertisement(models.Model):
     product_image = models.ImageField()
     price = models.FloatField()
     views = models.IntegerField(default=0)
+    sold = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -37,6 +38,28 @@ class Comments(models.Model):
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
     posted_on = models.DateField()
     description = models.CharField(max_length=1000)
+
+
+class UserRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    advertisement = models.ForeignKey(Advertisement, on_delete=models.CASCADE)
+    num_of_clicks = models.IntegerField(default=0)
+    rating = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        locked = self.rating == 5
+        if not locked:
+            if self.num_of_clicks >= 10:
+                self.rating = 5
+            elif 10 > self.num_of_clicks >= 8:
+                self.rating = 4
+            elif 8 > self.num_of_clicks >= 6:
+                self.rating = 3
+            elif 6 > self.num_of_clicks >= 3:
+                self.rating = 2
+            elif 3 > self.num_of_clicks >= 1:
+                self.rating = 1
+        super(UserRating, self).save(*args, **kwargs)
 
 
 class Replies(models.Model):

@@ -1,7 +1,9 @@
 import datetime
 
+import requests
 from django.contrib import messages
 from django.contrib.auth import logout, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -13,13 +15,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from home.forms import UserForm
-from home.models import Advertisement, Category, Comments, Replies
+from home.models import Advertisement, Category, Comments, Replies, UserRating
 
 
 class Home(View):
     def get(self, request):
-        latest_ads = Advertisement.objects.all().order_by('id').reverse()[0:8]
-        premium_ads = Advertisement.objects.filter(premium_ad=True).order_by('id').reverse()[0:4]
+        latest_ads = Advertisement.objects.all().order_by('id').reverse()[0:12]
+        premium_ads = Advertisement.objects.filter(premium_ad=True).order_by('id').reverse()[0:2]
         categories = Category.objects.all()
         return render(request,
                       context={'latest_ads': latest_ads,
@@ -66,14 +68,16 @@ class PostAdvertisement(View):
         used_for = request.POST.get('used_for', '1 Year')
         negotiable = request.POST.get('negotiable', False)
         category_name = request.POST.get('category', 'Electronics')
+        if category_name == 'Apparels':
+            category_name = 'Apparels & Accessories'
         category = Category.objects.get(name=category_name)
-        state = request.POST.get('state', 'Brand New')
+        state = request.POST.get('status', 'Used')
         description = request.POST.get('description', 'No text')
-        posted_by = User.objects.get(id=1)  # request.user
+        posted_by = request.user  # request.user
         posted_on = datetime.datetime.now()
         product_image = request.FILES['file']
         price = float(request.POST.get('price', '0'))
-        premium_ad = True
+        premium_ad = False
         warranty = request.POST.get('warranty', 'None')
         ad_obj = Advertisement.objects.create(title=title, used_for=used_for, negotiable=negotiable,
                                               category=category, state=state, description=description,
@@ -89,6 +93,7 @@ class PostAdvertisement(View):
                       )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PostComment(View):
     def post(self, request, pk):
         advertisement_obj = Advertisement.objects.get(id=pk)
@@ -100,7 +105,7 @@ class PostComment(View):
             posted_by=request.user
         )
         comment_obj.save()
-        return redirect('product_details')
+        return redirect('product_details', pk=f'{advertisement_obj.id}')
 
 
 class PostRelies(View):
@@ -119,7 +124,7 @@ class GetProductList(View):
     def get(self, request, category_id, page=1):
         category = Category.objects.get(id=category_id)
         products = Advertisement.objects.filter(category=category).order_by("views")
-        paginator = Paginator(products, per_page=5)
+        paginator = Paginator(products, per_page=8)
         paginated_products = paginator.get_page(page)
         return render(request=request,
                       context={'category_id': category.id,
@@ -134,12 +139,31 @@ class ShowProductDetails(View):
     def get(self, request, pk):
         comment_to_replies = []
         item = Advertisement.objects.get(id=pk)
+        Advertisement.objects.filter(id=pk).update(views=item.views + 1)
+        recommendation_ids = GetRecommendations.get_recommendations(user_id=request.user.id, product_id=item.id)
+        recommendations = Advertisement.objects.filter(id__in=recommendation_ids).order_by("views")
+        if request.user.is_authenticated:
+            user_rating = UserRating.objects.filter(
+                Q(advertisement=item) & Q(user=request.user)).first()
+
+            if user_rating:
+                user_rating.num_of_clicks += 1
+                user_rating.save()
+            else:
+                user_rating = UserRating(
+                    advertisement=item,
+                    user=request.user,
+                    num_of_clicks=1,
+                )
+                user_rating.save()
         comments = Comments.objects.filter(product=item).order_by('id')
         for comment in comments:
             replies = Replies.objects.filter(comment=comment).order_by('id')
             comment_to_replies.append({comment: replies})
         return render(request=request,
-                      context={'item': item, 'comments': comment_to_replies},
+                      context={'item': item,
+                               'comments': comment_to_replies,
+                               'recommendations': recommendations},
                       template_name="product_detail.html")
 
 
@@ -158,6 +182,51 @@ class SearchProduct(View):
                       template_name="search_list.html")
 
 
-class GetRecommendations(View):
+@method_decorator(login_required, name='dispatch')
+class Dashboard(View):
+    def get(self, request):
+        user = User.objects.get(id=request.user.id)
+        ads_posted = Advertisement.objects.filter(posted_by=user)
+        sold_ads = ads_posted.filter(sold=True).all()
+        live_ads = ads_posted.filter(sold=False).all()
+        total_ads = ads_posted.all()
+
+        return render(
+            request=request,
+            context={
+                'user': user,
+                'ads': total_ads,
+                'total_ads': len(ads_posted.all()),
+                'sold_ads': len(sold_ads.all()),
+                'live_ads': len(live_ads.all())
+            },
+            template_name='dashboard.html'
+        )
+
+
+class MarkSold(View):
     def get(self, request, pk):
-        return HttpResponseRedirect('login')
+        ad = Advertisement.objects.get(id=pk)
+        ad.sold = True
+        ad.save()
+        return redirect('dashboard')
+
+
+class DeleteAd(View):
+    def get(self, request, pk):
+        Advertisement.objects.get(id=pk).delete()
+        return redirect('dashboard')
+
+
+class GetRecommendations(object):
+    @staticmethod
+    def get_recommendations(user_id, product_id):
+        try:
+            URL = "http://localhost:8001/recommendations"
+            PARAMS = {'user_id': user_id,
+                      'product_id': product_id}
+            r = requests.get(url=URL, params=PARAMS)
+            data = r.json()
+        except:
+            data = []
+        return data

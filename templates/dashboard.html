@@ -1,0 +1,203 @@
+{% extends 'nav.html' %}
+{% load static %}
+
+
+{% block content %}
+<head>
+    <link rel="stylesheet" href="profile.css">
+    <title>Profile Card</title>
+</head>
+<body>
+<div class="row d-flex justify-content-center align-items-center">
+    <div class="profilecard">
+        <div class="profileinfo">
+            <span>{{user.username}}</span>
+            <span>Advertisement Details for {{user.username}}</span>
+        </div>
+        <hr>
+        <div class="followerinfo">
+            <div class="following">
+                <span>{{total_ads}}</span>
+                <span>Total Ads Posted</span>
+            </div>
+            <div class="vl"></div>
+            <div class="follower">
+                <span>{{sold_ads}}</span>
+                <span>Sold Ads</span>
+            </div>
+            <div class="vl"></div>
+            <div class="post">
+                <span>{{live_ads}}</span>
+                <span>Live Ads</span>
+            </div>
+        </div>
+        <hr>
+    </div>
+</div>
+<section class="vh-80" style="background-color: #eee;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-12 col-xl-10">
+
+                <div class="card">
+                    <div class="card-header p-3">
+                        <h5 class="mb-0"><i class="fas fa-tasks me-1"></i> Your Advertisements</h5>
+                    </div>
+                    <div class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px">
+
+                        <table class="table mb-0">
+                            <thead>
+                            <tr>
+                                <th scope="col">Advertisement</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Posted</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ad in ads %}
+                            <tr class="fw-normal">
+                                <th>
+                                    <span>{{ad.title}}</span>
+                                </th>
+                                <td class="align-middle">
+                                    <span>{{ad.description| slice:40}}</span>
+                                </td>
+                                <td class="align-middle">
+                                    <h6><span class="badge">{{ad.posted_on}}</span></h6>
+                                </td>
+                                <td class="align-middle">
+                                    {% if not ad.sold %}
+                                    <a href="{% url 'sold' ad.id %}"
+                                       data-mdb-toggle="tooltip" title="Mark as sold"><i id="myBtn"
+                                                                                         class="far fa-handshake"></i></a>
+                                    {% else %}
+                                    {% endif %}
+
+                                    <a href="{% url 'delete_ad' ad.id %}"
+                                       data-mdb-toggle="tooltip" title="Remove Ad"><i
+                                            class="fas fa-trash-alt text-danger"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+<style>
+body {
+    background-color: rgb(250, 252, 252);
+}
+
+.profilecard {
+    background-color: lightyellow;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 43%;
+    border-radius: 20px;
+    overflow-x: clip;
+}
+
+.profileinfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 7%;
+}
+
+.profileinfo>span:nth-of-type(1) {
+    font-weight: bold;
+
+}
+
+.followerinfo {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.following {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.following>span:nth-of-type(1) {
+    font-weight: bold;
+    font-size: large;
+}
+
+.follower {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.follower>span:nth-of-type(1) {
+    font-weight: bold;
+    font-size: large;
+}
+
+.post {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.post>span:nth-of-type(1) {
+    font-weight: bold;
+    font-size: large;
+}
+
+.vl {
+    height: 60px;
+    border: 1px solid grey;
+}
+
+hr {
+    border: 1px solid grey;
+    width: 500px;
+}
+
+.infoimages {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.infoimages>img:nth-of-type(1) {
+    width: 100%;
+    height: 250px;
+}
+
+.infoimages>img:nth-of-type(2) {
+    width: 20%;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -3rem;
+}
+
+
+
+
+
+
+</style>
+
+{% endblock %}
+</html>

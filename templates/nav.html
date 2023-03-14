@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    {% block title %}
+    {% endblock %}
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'category/css/style.css' %}" rel="stylesheet">
+</head>
+
+<!-- Topbar Start -->
+<div class="container-fluid">
+    <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
+        <div class="col-lg-4">
+            <a href="{% url 'homepage' %}" class="text-decoration-none">
+                <span class="h1 text-uppercase text-primary bg-dark px-2">Second</span>
+                <span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">Market</span>
+            </a>
+        </div>
+        <div class="col-lg-4 col-6 text-left">
+            <form action="{% url 'product_search' 1 %}" method="GET" value="{{request.GET.q}}">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="q" placeholder="Search for products">
+                    <div class="input-group-append">
+                            <span class="input-group-text bg-transparent text-primary">
+                                <button type="submit" style="color:orange; width:40px;background:white;border:None" class="fa fa-search"></button></span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-4 col-6 text-right">
+            <p class="m-0">Help line</p>
+            <h5 class="m-0">+041 123 6755</h5>
+        </div>
+    </div>
+</div>
+<!-- Topbar End -->
+
+{% block content %}
+{% endblock %}
+
+</html>

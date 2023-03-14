@@ -3,6 +3,63 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block navbar %}
+<!-- Navbar Start -->
+<div class="container-fluid bg-dark mb-30">
+    <div class="row px-xl-5">
+        <div class="col-lg-3 d-none d-lg-block">
+            <a class="btn d-flex align-items-center justify-content-between bg-primary w-100" data-toggle="collapse"
+               href="#navbar-vertical" style="height: 65px; padding: 0 30px;">
+                <h6 class="text-dark m-0"><i class="fa fa-bars mr-2"></i>Categories</h6>
+                <i class="fa fa-angle-down text-dark"></i>
+            </a>
+            <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light"
+                 id="navbar-vertical" style="width: calc(100% - 30px); z-index: 999;">
+                <div class="navbar-nav w-100">
+                    {% for category in categories %}
+                    <a href="{% url 'product_list' category.id 1%}" class="nav-item nav-link">{{category.name}}</a>
+
+                    {% endfor %}
+                </div>
+            </nav>
+        </div>
+        <div class="col-lg-9">
+            <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0">
+                <a href="" class="text-decoration-none d-block d-lg-none">
+                    <span class="h1 text-uppercase text-dark bg-light px-2">Second</span>
+                    <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Market</span>
+                </a>
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                    <div class="navbar-nav mr-auto py-0">
+                        <a href="{% url 'homepage' %}" class="nav-item nav-link active">Home</a>
+                        {% if user.is_authenticated %}
+                        <a href='{% url "dashboard" %}' class="nav-item nav-link">Dashboard</a>
+                        <a href='{% url "logout" %}' class="nav-item nav-link">Logout</a>
+                        {% else %}
+                        <a href='{% url "login" %}' class="nav-item nav-link">Login</a>
+                        <a href='{% url "signup" %}' class="nav-item nav-link">Register</a>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
+                        <a href="{% url 'post_ad' %}" class="btn px-0">
+                            <i class="fas fa-plus text-primary"></i>
+                            <span class="badge text-secondary border border-secondary rounded-square"
+                                  style="padding-bottom: 2px;">post ad</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- Navbar End -->
+{% endblock %}
+
 {% block body %}
 <body>
 
@@ -17,22 +74,36 @@
                              style="object-fit: cover;">
                         <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                             <div class="p-3" style="max-width: 700px;">
-                                <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Second Sale</h1>
-                                <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Best Site for buying and selling second hand products</p>
+                                <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Second
+                                    Sale</h1>
+                                <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Best Site for buying and
+                                    selling second hand products</p>
                                 {% if not user.is_authenticated %}
                                 <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp"
                                    href="#">Signup</a>
-                                {{MEDIA_URL}}
                                 {% endif %}
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-4">
+            {% for ad in premium_ads %}
+            <div class="product-offer mb-30" style="height: 200px;">
+                <img width="200" height="100" src="{{ad.product_image.url}}" alt="">
+                <div class="offer-text">
+                    <h6 class="text-white text-uppercase">{{ad.title}}</h6>
+                    <h3 class="text-white mb-3">Gold Advertisement</h3>
+                    <h6 class="text-white mb-3">${{ad.price}}</h6>
+                    <a href="{% url 'product_details' ad.id %}" class="btn btn-primary">Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+
 </div>
 <!-- Carousel End -->
 
@@ -61,60 +132,17 @@
 </div>
 <!-- Categories End -->
 
-
-<!-- Products Start -->
+<div>
 <div class="container-fluid pt-5 pb-3">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Gold Advertisements</span>
-    </h2>
-
-    <div class="row px-xl-5">
-        {% for ad in premium_ads %}
-        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-            <div class="product-item bg-light mb-4">
-                <div class="product-img position-relative overflow-hidden">
-                    {% if ad.product_image %}
-                    <img width="370" height="250" src="{{ad.product_image.url}}" alt="">
-                    {% else %}
-                    <img width="370" height="250"
-                         src="https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg"
-                         alt="">
-                    {% endif %}
-                </div>
-                <div class="text-center py-4">
-                    <a class="h6 text-decoration-none text-truncate" href="{% url 'product_details' ad.id %}">{{ad.title}}</a>
-                    <div class="d-flex align-items-center justify-content-center mt-2">
-                        <h5>${{ad.price}}</h5>
-                        <h6 class="text-muted ml-2">
-                            <del>${{ad.price}}</del>
-                        </h6>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-center mb-1">
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small>(99)</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-<!-- Products End -->
-
-
-<div class="container-fluid pt-5 pb-3">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Recent Advertisements</span>
+    <h2 class="section-title position-relative text-uppercase mx-xl-4 mb-5"><span class="bg-secondary pr-3">Recent Advertisements</span>
     </h2>
     <div class="row px-xl-5">
         {% for product in latest_ads %}
-        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+        <div class="col-lg-2 col-md-4 col-sm-6 pb-5">
             <div class="product-item bg-light mb-4">
                 <div class="product-img position-relative overflow-hidden">
                     {% if product.product_image %}
-                    <img width="370" height="250" src="{{product.product_image.url}}" alt="">
+                    <img width="310" height="250" src="{{product.product_image.url}}" alt="">
                     {% else %}
                     <img src="https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg"
                          alt="">
@@ -124,18 +152,14 @@
                 <div class="text-center py-4">
                     <a class="h6 text-decoration-none text-truncate" href="{% url 'product_details' product.id %}">{{product.title}}</a>
                     <div class="d-flex align-items-center justify-content-center mt-2">
-                        <h5>$123.00</h5>
-                        <h6 class="text-muted ml-2">
-                            <del>${{product.price}}</del>
+                        <h5>${{product.price}}</h5>
+                        <h6>(<span>{{product.state}}</span>)
+
                         </h6>
                     </div>
                     <div class="d-flex align-items-center justify-content-center mb-1">
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small>(99)</small>
+
+                        <small>views: <span>{{product.views}}<span></span></small>
                     </div>
                 </div>
             </div>
@@ -143,6 +167,7 @@
         {% endfor %}
     </div>
 </div>
+
 <!-- Products End -->
 
 

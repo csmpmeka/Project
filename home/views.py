@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import requests
 from django.contrib import messages
@@ -141,7 +142,8 @@ class ShowProductDetails(View):
         item = Advertisement.objects.get(id=pk)
         Advertisement.objects.filter(id=pk).update(views=item.views + 1)
         recommendation_ids = GetRecommendations.get_recommendations(user_id=request.user.id, product_id=item.id)
-        recommendations = Advertisement.objects.filter(id__in=recommendation_ids).order_by("views")
+        # recommendations = Advertisement.objects.filter(id__in=recommendation_ids).order_by("views")
+        recommendations = Advertisement.objects.all().order_by("views")[0:5]
         if request.user.is_authenticated:
             user_rating = UserRating.objects.filter(
                 Q(advertisement=item) & Q(user=request.user)).first()
@@ -218,7 +220,7 @@ class DeleteAd(View):
         return redirect('dashboard')
 
 
-class GetRecommendations(object):
+class GetRecommendations(View):
     @staticmethod
     def get_recommendations(user_id, product_id):
         try:
@@ -228,5 +230,5 @@ class GetRecommendations(object):
             r = requests.get(url=URL, params=PARAMS)
             data = r.json()
         except:
-            data = []
+            data= random.randint(30)
         return data
